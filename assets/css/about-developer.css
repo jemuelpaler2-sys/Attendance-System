@@ -559,10 +559,10 @@
 
 .tech-logo img {
     display: block;
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
+    width: 32px !important;
+    height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
     object-fit: contain;
 }
 
@@ -640,6 +640,13 @@
         padding: 6px;
         border-radius: 12px;
         overflow: hidden;
+    }
+
+    .tech-logo img {
+        width: 30px !important;
+        height: 30px !important;
+        max-width: 30px !important;
+        max-height: 30px !important;
     }
 
     .tech-name {
