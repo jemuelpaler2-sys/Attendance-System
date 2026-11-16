@@ -69,7 +69,7 @@ $selectedClass = $classFilter > 0 ? ($classMap[$classFilter] ?? null) : null;
 $scopeLabel = $selectedClass ? $selectedClass['name'] : 'All my classes';
 
 /* Status totals within the teacher's scope */
-$scopeWhere = 'cs.teacher_id = ? AND a.attendance_date BETWEEN ? AND ?';
+$scopeWhere = 'cs.teacher_id = ? AND a.attendance_date BETWEEN ? AND ? AND ' . attendance_school_day_sql('a.attendance_date');
 $scopeParams = [$teacherId, $from, $to];
 
 if ($classFilter > 0) {
@@ -128,10 +128,11 @@ $stmt = $pdo->prepare(
      JOIN users u ON u.id = s.user_id
      JOIN classes c ON c.id = s.class_id
      JOIN class_subjects cs ON cs.class_id = s.class_id AND cs.teacher_id = ?
-     LEFT JOIN attendance a
-            ON a.student_id = s.id
-           AND a.class_subject_id = cs.id
-           AND a.attendance_date BETWEEN ? AND ?
+      LEFT JOIN attendance a
+             ON a.student_id = s.id
+            AND a.class_subject_id = cs.id
+            AND a.attendance_date BETWEEN ? AND ?
+            AND " . attendance_school_day_sql('a.attendance_date') . "
      WHERE {$studentWhere}
      GROUP BY s.id, s.student_no, u.full_name, u.avatar_color, c.name
      ORDER BY u.full_name"
@@ -140,7 +141,7 @@ $stmt->execute($studentParams);
 $studentRows = $stmt->fetchAll();
 
 /* Per-subject breakdown for this teacher */
-$subjectJoin = 'a.attendance_date BETWEEN ? AND ?';
+$subjectJoin = 'a.attendance_date BETWEEN ? AND ? AND ' . attendance_school_day_sql('a.attendance_date');
 $subjectParams = [$from, $to];
 
 if ($studentFilter > 0) {

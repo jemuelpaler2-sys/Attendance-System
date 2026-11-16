@@ -92,8 +92,9 @@ function attendance_roster(PDO $pdo, int $classSubjectId, string $date): array
     $stmt->execute([$date, $classSubjectId]);
     $rows = $stmt->fetchAll();
 
+    $schoolDay = is_school_day($date);
     foreach ($rows as &$row) {
-        if (empty($row['status'])) {
+        if ($schoolDay && empty($row['status'])) {
             $row['status'] = 'present';
         }
     }
@@ -110,6 +111,10 @@ function save_attendance(PDO $pdo, int $classSubjectId, string $date, array $ent
 {
     if (!is_valid_date($date) || $date > date('Y-m-d')) {
         throw new InvalidArgumentException('Attendance date must be today or earlier.');
+    }
+
+    if (is_weekend($date)) {
+        throw new InvalidArgumentException('No Class: attendance cannot be recorded on weekends.');
     }
 
     $allowed = ['present', 'late', 'absent', 'excused'];

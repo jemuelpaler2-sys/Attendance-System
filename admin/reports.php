@@ -45,12 +45,17 @@ if ($classFilter > 0) {
          FROM attendance a
          JOIN class_subjects cs ON cs.id = a.class_subject_id
          WHERE cs.class_id = ? AND a.attendance_date BETWEEN ? AND ?
+           AND ' . attendance_school_day_sql('a.attendance_date') . '
          GROUP BY a.status'
     );
     $stmt->execute([$classFilter, $from, $to]);
 } else {
     $stmt = $pdo->prepare(
-        'SELECT status, COUNT(*) AS total FROM attendance WHERE attendance_date BETWEEN ? AND ? GROUP BY status'
+        'SELECT status, COUNT(*) AS total
+         FROM attendance
+         WHERE attendance_date BETWEEN ? AND ?
+           AND ' . attendance_school_day_sql('attendance_date') . '
+         GROUP BY status'
     );
     $stmt->execute([$from, $to]);
 }
@@ -83,6 +88,7 @@ if ($classFilter > 0) {
              FROM attendance att
              JOIN class_subjects cs ON cs.id = att.class_subject_id
              WHERE cs.class_id = ? AND att.attendance_date BETWEEN ? AND ?
+               AND " . attendance_school_day_sql('att.attendance_date') . "
          ) a ON a.student_id = s.id
      WHERE s.class_id = ? AND s.status = 'enrolled'
      GROUP BY s.id, s.student_no, u.full_name, u.avatar_color
@@ -101,6 +107,7 @@ if ($classFilter > 0) {
          FROM class_subjects cs
          JOIN subjects sub ON sub.id = cs.subject_id
          LEFT JOIN attendance a ON a.class_subject_id = cs.id AND a.attendance_date BETWEEN ? AND ?
+                AND " . attendance_school_day_sql('a.attendance_date') . "
      WHERE cs.class_id = ?
      GROUP BY cs.id, sub.code, sub.name
      ORDER BY sub.name"
@@ -118,6 +125,7 @@ if ($classFilter > 0) {
          FROM classes c
          LEFT JOIN class_subjects cs ON cs.class_id = c.id
          LEFT JOIN attendance a ON a.class_subject_id = cs.id AND a.attendance_date BETWEEN ? AND ?
+                AND " . attendance_school_day_sql('a.attendance_date') . "
      GROUP BY c.id, c.name, c.grade_level, c.section
      ORDER BY c.grade_level, c.section"
     );

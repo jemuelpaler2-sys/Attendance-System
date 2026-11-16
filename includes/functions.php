@@ -75,6 +75,29 @@ function is_valid_date(string $date): bool
     return $d !== false && $d->format('Y-m-d') === $date;
 }
 
+function is_weekend(?string $date): bool
+{
+    if (!$date || !is_valid_date($date)) {
+        return false;
+    }
+
+    return (int) (new DateTimeImmutable($date))->format('N') >= 6;
+}
+
+function is_school_day(?string $date): bool
+{
+    return is_valid_date((string) $date) && !is_weekend($date);
+}
+
+function attendance_school_day_sql(string $column = 'attendance_date'): string
+{
+    if (!preg_match('/^[A-Za-z0-9_.]+$/', $column)) {
+        throw new InvalidArgumentException('Invalid attendance date column.');
+    }
+
+    return 'DAYOFWEEK(' . $column . ') BETWEEN 2 AND 6';
+}
+
 /* ---------------------------------------------------------
    Session, auth & flash messages
 --------------------------------------------------------- */

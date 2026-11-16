@@ -7,6 +7,7 @@ require_once __DIR__ . '/../includes/auth.php';
 require_role('admin');
 
 $pdo = db();
+$isNoClassToday = is_weekend(date('Y-m-d'));
 
 /* Core counters */
 $counters = $pdo->query(
@@ -19,7 +20,7 @@ $counters = $pdo->query(
 
 /* Today's attendance breakdown */
 $todayCounts = ['present' => 0, 'late' => 0, 'absent' => 0, 'excused' => 0];
-$stmt = $pdo->query("SELECT status, COUNT(*) AS total FROM attendance WHERE attendance_date = CURDATE() GROUP BY status");
+$stmt = $pdo->query("SELECT status, COUNT(*) AS total FROM attendance WHERE attendance_date = CURDATE() AND " . attendance_school_day_sql('attendance_date') . " GROUP BY status");
 foreach ($stmt->fetchAll() as $row) {
     if (isset($todayCounts[$row['status']])) {
         $todayCounts[$row['status']] = (int) $row['total'];
@@ -33,9 +34,10 @@ $trend = [];
 for ($i = 6; $i >= 0; $i--) {
     $day = date('Y-m-d', strtotime('-' . $i . ' days'));
     $trend[$day] = [
-        'label' => date('D', strtotime($day)),
-        'rate'  => 0.0,
-        'total' => 0,
+        'label'    => date('D', strtotime($day)),
+        'rate'     => 0.0,
+        'total'    => 0,
+        'no_class' => is_weekend($day),
     ];
 }
 
@@ -45,6 +47,7 @@ $stmt = $pdo->prepare(
             SUM(CASE WHEN status IN ('present','late') THEN 1 ELSE 0 END) AS attended
      FROM attendance
      WHERE attendance_date BETWEEN ? AND ?
+       AND " . attendance_school_day_sql('attendance_date') . "
      GROUP BY attendance_date"
 );
 $stmt->execute([array_key_first($trend), array_key_last($trend)]);
@@ -72,6 +75,7 @@ $classRows = $pdo->query(
      FROM classes c
      LEFT JOIN class_subjects cs ON cs.class_id = c.id
      LEFT JOIN attendance a ON a.class_subject_id = cs.id AND a.attendance_date = CURDATE()
+            AND " . attendance_school_day_sql('a.attendance_date') . "
      WHERE c.status = 'active'
      GROUP BY c.id, c.name, c.grade_level, c.section
      ORDER BY c.grade_level, c.section"
@@ -88,6 +92,7 @@ $atRisk = $pdo->query(
      JOIN attendance a ON a.student_id = s.id
      WHERE s.status = 'enrolled'
        AND a.attendance_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+       AND " . attendance_school_day_sql('a.attendance_date') . "
      GROUP BY s.id, u.full_name, u.avatar_color, s.student_no, c.name
      HAVING COUNT(a.id) > 0
         AND (SUM(CASE WHEN a.status IN ('present','late') THEN 1 ELSE 0 END) / COUNT(a.id)) < 0.90
@@ -106,6 +111,7 @@ $recent = $pdo->query(
      JOIN class_subjects cs ON cs.id = a.class_subject_id
      JOIN subjects sub ON sub.id = cs.subject_id
      JOIN classes c ON c.id = cs.class_id
+     WHERE " . attendance_school_day_sql('a.attendance_date') . "
      ORDER BY a.updated_at DESC, a.id DESC
      LIMIT 6"
 )->fetchAll();
@@ -182,8 +188,8 @@ require __DIR__ . '/../includes/header.php';
             </span>
         </div>
         <div>
-            <div class="stat-value"><?= number_format($todayRate, 1) ?>%</div>
-            <div class="stat-label">Attendance today</div>
+            <div class="stat-value"><?= $isNoClassToday ? 'No Class' : number_format($todayRate, 1) . '%' ?></div>
+            <div class="stat-label"><?= $isNoClassToday ? 'Weekend — no classes' : 'Attendance today' ?></div>
         </div>
     </div>
 </div>
@@ -202,10 +208,15 @@ require __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="chart-bars" role="img" aria-label="Attendance rate for the last seven days">
-            <?php foreach ($trend as $day): ?>
-                <?php $height = $day['total'] > 0 ? max(3, min(100, $day['rate'])) : 2; ?>
-                <div class="bar-col" title="<?= e($day['label']) ?>: <?= number_format($day['rate'], 1) ?>% (<?= (int) $day['total'] ?> records)">
-                    <span class="bar-value"><?= $day['total'] > 0 ? number_format($day['rate'], 0) . '%' : '—' ?></span>
+            <?php foreach ($trend as $day):
+                $dayNoClass = !empty($day['no_class']);
+                $height = $day['total'] > 0 ? max(3, min(100, $day['rate'])) : 2;
+                $title = $dayNoClass
+                    ? $day['label'] . ': No Class'
+                    : $day['label'] . ': ' . number_format($day['rate'], 1) . '% (' . (int) $day['total'] . ' records)';
+            ?>
+                <div class="bar-col" title="<?= e($title) ?>">
+                    <span class="bar-value"<?= $dayNoClass ? ' style="font-size:10px;white-space:nowrap"' : '' ?>><?= $dayNoClass ? 'No Class' : ($day['total'] > 0 ? number_format($day['rate'], 0) . '%' : '—') ?></span>
                     <div class="bar-track">
                         <div class="bar-fill<?= $day['total'] > 0 ? '' : ' muted' ?>" style="--h: <?= $height ?>%"></div>
                     </div>
@@ -230,7 +241,7 @@ require __DIR__ . '/../includes/header.php';
         <div class="card-head">
             <div>
                 <h2>Today's breakdown</h2>
-                <p>All subject sessions</p>
+                <p><?= $isNoClassToday ? 'Weekend — no classes' : 'All subject sessions' ?></p>
             </div>
         </div>
 
@@ -255,10 +266,10 @@ require __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="info-banner mt-24">
-            <span class="material-icons-round"><?= $todayRate >= 90 ? 'verified' : 'notification_important' ?></span>
+            <span class="material-icons-round"><?= $isNoClassToday ? 'event_busy' : ($todayRate >= 90 ? 'verified' : 'notification_important') ?></span>
             <div>
-                <strong><?= $todayRate >= 90 ? 'Attendance is on track' : 'Attendance needs attention' ?></strong>
-                <span><?= $todayRate >= 90 ? 'The school is meeting its daily attendance target.' : 'Consider following up with the classes below.' ?></span>
+                <strong><?= $isNoClassToday ? 'No Class today' : ($todayRate >= 90 ? 'Attendance is on track' : 'Attendance needs attention') ?></strong>
+                <span><?= $isNoClassToday ? 'Saturdays and Sundays are not school days. Attendance resumes on the next school day.' : ($todayRate >= 90 ? 'The school is meeting its daily attendance target.' : 'Consider following up with the classes below.') ?></span>
             </div>
         </div>
     </div>
@@ -269,7 +280,7 @@ require __DIR__ . '/../includes/header.php';
         <div class="card-head">
             <div>
                 <h2>Class attendance today</h2>
-                <p>Present and late students across each class</p>
+                <p><?= $isNoClassToday ? 'No Class — attendance is not recorded on weekends' : 'Present and late students across each class' ?></p>
             </div>
             <a class="btn btn-text btn-sm" href="<?= e(url('admin/classes.php')) ?>">Manage classes</a>
         </div>
@@ -283,7 +294,7 @@ require __DIR__ . '/../includes/header.php';
                 <div>
                     <div class="subject-bar-head">
                         <span><?= e($class['name']) ?></span>
-                        <strong><?= $total > 0 ? number_format($rate, 1) . '%' : 'No records' ?></strong>
+                        <strong><?= $isNoClassToday ? 'No Class' : ($total > 0 ? number_format($rate, 1) . '%' : 'No records') ?></strong>
                     </div>
                     <div class="progress <?= $total > 0 ? rate_class($rate) : '' ?>">
                         <span style="width: <?= $total > 0 ? max(2, $rate) : 0 ?>%"></span>

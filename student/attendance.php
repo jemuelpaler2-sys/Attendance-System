@@ -32,6 +32,7 @@ $subjects = $pdo->prepare(
      JOIN class_subjects cs ON cs.id = a.class_subject_id
      JOIN subjects sub ON sub.id = cs.subject_id
      WHERE a.student_id = ?
+       AND " . attendance_school_day_sql('a.attendance_date') . "
      ORDER BY sub.name"
 );
 $subjects->execute([$studentId]);
@@ -66,7 +67,7 @@ if ($subjectFilter > 0 && !in_array($subjectFilter, $subjectIds, true)) {
     $subjectFilter = 0;
 }
 
-$baseWhere = 'a.student_id = ? AND a.attendance_date BETWEEN ? AND ?';
+$baseWhere = 'a.student_id = ? AND a.attendance_date BETWEEN ? AND ? AND ' . attendance_school_day_sql('a.attendance_date');
 $baseParams = [$studentId, $from, $to];
 
 if ($subjectFilter > 0) {

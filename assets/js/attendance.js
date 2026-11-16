@@ -12,6 +12,19 @@
     var saveButton = document.getElementById("saveAttendanceBtn");
     var dirty = false;
     var saving = false;
+    var dateInput = form.querySelector('input[name="attendance_date"]');
+    var attendanceDate = form.getAttribute("data-attendance-date") || (dateInput ? dateInput.value : "");
+
+    function isWeekendDate(value) {
+        var parts = String(value || "").split("-");
+        if (parts.length !== 3) return false;
+
+        var date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        if (isNaN(date.getTime())) return false;
+
+        var day = date.getDay();
+        return day === 0 || day === 6;
+    }
 
     function setState(text, tone, icon) {
         if (!stateEl || !stateText) return;
@@ -25,6 +38,14 @@
     function markDirty() {
         dirty = true;
         setState("Unsaved changes", "dirty", "edit_note");
+    }
+
+    if (isWeekendDate(attendanceDate)) {
+        form.querySelectorAll("input, button, select, textarea").forEach(function (field) {
+            field.disabled = true;
+        });
+        setState("No Class — attendance cannot be recorded on weekends", "dirty", "event_busy");
+        return;
     }
 
     function updateSummary() {
@@ -70,6 +91,15 @@
     }
 
     form.addEventListener("submit", function (event) {
+        if (isWeekendDate(attendanceDate)) {
+            event.preventDefault();
+            setState("No Class — attendance cannot be recorded on weekends", "dirty", "event_busy");
+            if (window.showSnackbar) {
+                window.showSnackbar("No Class: Saturdays and Sundays are not school days.", "error");
+            }
+            return;
+        }
+
         if (saving) {
             event.preventDefault();
             return;

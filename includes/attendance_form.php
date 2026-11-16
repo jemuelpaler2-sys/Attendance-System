@@ -20,6 +20,7 @@ $attendanceDate = $attendanceDate ?? date('Y-m-d');
 $attendanceRoster = $attendanceRoster ?? [];
 $attendanceCs = $attendanceCs ?? null;
 $attendanceFilterPath = $attendanceFilterPath ?? 'admin/attendance.php';
+$attendanceIsNoClass = is_weekend($attendanceDate);
 $counts = attendance_counts($attendanceRoster);
 $today = date('Y-m-d');
 ?>
@@ -67,6 +68,14 @@ $today = date('Y-m-d');
             <p>Choose a class and subject above, then pick a date to load the student roster and mark attendance.</p>
         </div>
     </div>
+<?php elseif ($attendanceIsNoClass): ?>
+    <div class="card">
+        <div class="empty-state">
+            <span class="material-icons-round">event_busy</span>
+            <strong>No Class</strong>
+            <p><?= e(format_date($attendanceDate, 'l, F j, Y')) ?> falls on a weekend. Attendance is not recorded on Saturdays or Sundays.</p>
+        </div>
+    </div>
 <?php else: ?>
     <div class="table-card">
         <div class="table-toolbar">
@@ -91,7 +100,8 @@ $today = date('Y-m-d');
         <form id="attendanceForm"
               method="post"
               action="<?= e(url($attendanceFilterPath)) ?>"
-              data-attendance-form>
+              data-attendance-form
+              data-attendance-date="<?= e($attendanceDate) ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="save_attendance" value="1">
             <input type="hidden" name="class_subject_id" value="<?= (int) $attendanceSelectedId ?>">

@@ -74,10 +74,11 @@ $stmt = $pdo->prepare(
      JOIN users u ON u.id = s.user_id
      JOIN classes c ON c.id = s.class_id
      JOIN class_subjects cs ON cs.class_id = s.class_id AND cs.teacher_id = ?
-     LEFT JOIN attendance a
-            ON a.student_id = s.id
-           AND a.class_subject_id = cs.id
-           AND a.attendance_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+      LEFT JOIN attendance a
+             ON a.student_id = s.id
+            AND a.class_subject_id = cs.id
+            AND a.attendance_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+            AND " . attendance_school_day_sql('a.attendance_date') . "
      WHERE {$whereSql}
      GROUP BY s.id, s.student_no, s.guardian_name, s.guardian_phone,
               u.full_name, u.avatar_color, u.email,
@@ -102,8 +103,9 @@ $stmt = $pdo->prepare(
             COALESCE(SUM(CASE WHEN a.status IN ('present','late') THEN 1 ELSE 0 END), 0) AS attended
      FROM attendance a
      JOIN class_subjects cs ON cs.id = a.class_subject_id
-     WHERE cs.teacher_id = ? AND a.attendance_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)"
-);
+     WHERE cs.teacher_id = ? AND a.attendance_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+       AND " . attendance_school_day_sql('a.attendance_date') . ""
+    );
 $stmt->execute([$teacherId]);
 $summary = $stmt->fetch();
 $scopeTotal = (int) ($summary['total'] ?? 0);
@@ -120,6 +122,7 @@ $stmt = $pdo->prepare(
         JOIN attendance a ON a.student_id = s.id AND a.class_subject_id = cs.id
         WHERE cs.teacher_id = ? AND s.status = 'enrolled'
           AND a.attendance_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+          AND " . attendance_school_day_sql('a.attendance_date') . "
         GROUP BY s.id
         HAVING COUNT(DISTINCT a.id) > 0
            AND (SUM(CASE WHEN a.status IN ('present','late') THEN 1 ELSE 0 END) / COUNT(DISTINCT a.id)) < 0.90

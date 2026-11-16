@@ -38,7 +38,7 @@ $smartrollDb = $smartrollConfig['db'] ?? [];
 
 define('APP_NAME', 'SmartRoll');
 define('SCHOOL_NAME', 'Nonok Norte National High School');
-define('APP_VERSION', '1.0.0');
+define('APP_VERSION', '1.0.1');
 define('APP_ENV', (string) ($smartrollConfig['environment'] ?? $smartrollEnvironment));
 define('APP_DEBUG', (bool) ($smartrollConfig['debug'] ?? false));
 

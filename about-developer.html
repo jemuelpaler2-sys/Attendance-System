@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a73e8">
+    <title>About the Developer · SmartRoll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/about-developer.css">
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem("smartroll-theme");
+                if (saved === "dark") document.documentElement.setAttribute("data-theme", "dark");
+            } catch (e) { }
+        })();
+    </script>
+</head>
+<body class="developer-body">
+
+<main>
+    <section class="dev-hero">
+        <header class="dev-topbar">
+            <div class="dev-topbar-inner">
+                <a class="dev-brand" href="about-developer.html" aria-label="SmartRoll – About the Developer">
+                    <span class="logo-mark"><span class="material-icons-round">how_to_reg</span></span>
+                    <span class="dev-brand-text">
+                        <strong>SmartRoll</strong>
+                        <span>Nonok Norte National High School</span>
+                    </span>
+                </a>
+
+                <div class="dev-topbar-actions">
+                    <button class="icon-btn dev-theme-btn" type="button" data-theme-toggle aria-label="Toggle dark mode">
+                        <span class="material-icons-round">dark_mode</span>
+                    </button>
+                    <a class="dev-back" href="login.php">
+                        <span class="material-icons-round" aria-hidden="true">arrow_back</span>
+                        <span>Back to Login</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="dev-hero-inner">
+            <div class="dev-hero-copy">
+                <span class="auth-eyebrow">
+                    <span class="material-icons-round" aria-hidden="true" style="font-size:15px">person</span>
+                    About the Developer
+                </span>
+
+                <h1><span class="dev-name">Jemuel A. Paler</span></h1>
+                <p class="dev-hero-role">BSIT-Programming</p>
+                <p class="dev-hero-tagline">
+                    Developer of SmartRoll, the student attendance management system built for
+                    Nonok Norte National High School.
+                </p>
+
+                <div class="dev-hero-actions">
+                    <a class="dev-hero-link" href="#profile">
+                        View developer profile
+                        <span class="material-icons-round" aria-hidden="true">arrow_downward</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="dev-avatar-wrap">
+                <div class="dev-avatar dev-image">
+                    <img src="assets/images/developer/profile.png"
+                         alt="[INSERT DEVELOPER PROFILE PICTURE HERE]"
+                         data-dev-image>
+                    <span class="dev-image-placeholder">
+                        <span class="material-icons-round" aria-hidden="true">add_a_photo</span>
+                        <span>[INSERT DEVELOPER PROFILE PICTURE HERE]</span>
+                        <small>assets/images/developer/profile.png</small>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="dev-content">
+        <!-- Developer profile -->
+        <section class="about-section dev-section" id="profile" aria-labelledby="profileTitle">
+            <div class="about-section-head">
+                <span class="material-icons-round" aria-hidden="true">badge</span>
+                <div>
+                    <h3 id="profileTitle">Developer Profile</h3>
+                    <p>Background, education, and the skills used to build SmartRoll.</p>
+                </div>
+            </div>
+
+            <div class="dev-profile-grid">
+                <div class="dev-bio-card">
+                    <h4>Biography</h4>
+                    <p class="dev-bio-placeholder">I am a passionate and dedicated Information Technology student with an interest in web development, programming, and modern technology. I enjoy learning new technical skills and exploring different tools that help me create useful, functional, and user-friendly applications.
+
+                     I have basic knowledge of HTML, CSS, JavaScript, PHP, and MySQL, along with experience using development tools such as Visual Studio Code and XAMPP. I am continuously improving my programming, problem-solving, and technical skills through academic projects and hands-on activities.
+
+                     My goal is to become a skilled IT professional and software developer who can create innovative solutions to real-world problems. I believe that continuous learning, creativity, and dedication are essential to becoming a successful developer.</p>
+
+                </div>
+
+                <div class="dev-facts">
+                    <div class="about-project-item">
+                        <span>Full name</span>
+                        <strong>Jemuel Alejandria Paler</strong>
+                    </div>
+                    <div class="about-project-item">
+                        <span>Role</span>
+                        <strong>BSIT-Programming Student</strong>
+                    </div>
+                    <div class="about-project-item">
+                        <span>Educational background</span>
+                        <strong>Bachelor of Science in Information Technology - Programming</strong>
+                    </div>
+                    <div class="about-project-item">
+                        <span>Email</span>
+                        <strong>jemuelpaler2@gmail.com</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dev-subhead">
+                <span class="material-icons-round" aria-hidden="true">build</span>
+                <span>Skills &amp; Technologies</span>
+            </div>
+
+            <div class="tech-skills">
+                <div class="tech-category" aria-labelledby="techLanguages">
+                    <div class="tech-category-head">
+                        <span class="material-icons-round" aria-hidden="true">code</span>
+                        <div>
+                            <h4 id="techLanguages">Programming Languages</h4>
+                            <p>The core languages used to build SmartRoll.</p>
+                        </div>
+                    </div>
+                    <div class="tech-grid">
+                        <div class="tech-card">
+                            <span class="tech-logo">
+                                <img src="assets/developer/logos/php.svg" alt="PHP logo" loading="lazy" data-tech-logo data-fallback="php/php-original.svg">
+                            </span>
+                            <span class="tech-name">PHP</span>
+                        </div>
+                        <div class="tech-card">
+                            <span class="tech-logo">
+                                <img src="assets/developer/logos/html5.svg" alt="HTML5 logo" loading="lazy" data-tech-logo data-fallback="html5/html5-original.svg">
+                            </span>
+                            <span class="tech-name">HTML5</span>
+                        </div>
+                        <div class="tech-card">
+                            <span class="tech-logo">
+                                <img src="assets/developer/logos/javascript.svg" alt="JavaScript logo" loading="lazy" data-tech-logo data-fallback="javascript/javascript-original.svg">
+                            </span>
+                            <span class="tech-name">JavaScript</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-category" aria-labelledby="techFrontend">
+                    <div class="tech-category-head">
+                        <span class="material-icons-round" aria-hidden="true">devices</span>
+                        <div>
+                            <h4 id="techFrontend">Frontend Development</h4>
+                            <p>Building responsive, user-friendly interfaces.</p>
+                        </div>
+                    </div>
+                    <div class="tech-grid">
+                        <div class="tech-card">
+                            <span class="tech-logo">
+                                <img src="assets/developer/logos/react.svg" alt="React logo" loading="lazy" data-tech-logo data-fallback="react/react-original.svg">
+                            </span>
+                            <span class="tech-name">React</span>
+                        </div>
+                        <div class="tech-card">
+                            <span class="tech-logo">
+                                <img src="assets/developer/logos/css3.svg" alt="CSS3 logo" loading="lazy" data-tech-logo data-fallback="css3/css3-original.svg">
+                            </span>
+                            <span class="tech-name">CSS3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-category" aria-labelledby="techDatabase">
+                    <div class="tech-category-head">
+                        <span class="material-icons-round" aria-hidden="true">storage</span>
+                        <div>
+                            <h4 id="techDatabase">Database Management</h4>
+                            <p>Storing and organizing student attendance records.</p>
+                        </div>
+                    </div>
+                    <div class="tech-grid">
+                        <div class="tech-card">
+                            <span class="tech-logo">
+                                <img src="assets/developer/logos/mysql.svg" alt="MySQL logo" loading="lazy" data-tech-logo data-fallback="mysql/mysql-original.svg">
+                            </span>
+                            <span class="tech-name">MySQL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-category" aria-labelledby="techTools">
+                    <div class="tech-category-head">
+                        <span class="material-icons-round" aria-hidden="true">construction</span>
+                        <div>
+                            <h4 id="techTools">Development Tools</h4>
+                            <p>Tools used for writing, testing, and managing code.</p>
+                        </div>
+                    </div>
+                    <div class="tech-grid">
+                        <div class="tech-card">
+                            <span class="tech-logo">
+                                <img src="assets/developer/logos/vscode.svg" alt="Visual Studio Code logo" loading="lazy" data-tech-logo data-fallback="vscode/vscode-original.svg">
+                            </span>
+                            <span class="tech-name">VS Code</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-category" aria-labelledby="techBackend">
+                    <div class="tech-category-head">
+                        <span class="material-icons-round" aria-hidden="true">dns</span>
+                        <div>
+                            <h4 id="techBackend">Backend Development</h4>
+                            <p>Server-side logic and application processing.</p>
+                        </div>
+                    </div>
+                    <div class="tech-grid">
+                        <div class="tech-card">
+                            <span class="tech-logo">
+                                <img src="assets/developer/logos/php.svg" alt="PHP logo" loading="lazy" data-tech-logo data-fallback="php/php-original.svg">
+                            </span>
+                            <span class="tech-name">PHP</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certificates -->
+        <section class="about-section dev-section" id="certificates" aria-labelledby="certificatesTitle">
+            <div class="about-section-head">
+                <span class="material-icons-round" aria-hidden="true">workspace_premium</span>
+                <div>
+                    <h3 id="certificatesTitle">Certificates &amp; Achievements</h3>
+                    <p>Click a certificate to view it in a larger preview.</p>
+                </div>
+            </div>
+
+            <div class="about-cert-grid">
+                <figure class="cert-card"
+                        data-cert-title="Design Patterns Certification"
+                        data-cert-description="">
+                    <button class="cert-media" type="button" data-certificate-open
+                            aria-label="View [INSERT CERTIFICATE TITLE 1 HERE]">
+                        <span class="cert-media-inner dev-image" data-cert-media>
+                            <img src="assets/images/developer/designpattern.jpg"
+                                 alt="Image not found"
+                                 loading="lazy"
+                                 data-dev-image>
+                            <span class="dev-image-placeholder">
+                                <span class="material-icons-round" aria-hidden="true">workspace_premium</span>
+                                <span>Design Patterns</span>
+                                <small>assets/images/developer/designpattern.jpg</small>
+                            </span>
+                        </span>
+                        <span class="cert-media-overlay" aria-hidden="true">
+                            <span class="material-icons-round">zoom_in</span>
+                        </span>
+                    </button>
+                    <figcaption class="cert-body">
+                        <strong>Design Patterns Certificate</strong>
+                        <p></p>
+                    </figcaption>
+                </figure>
+
+                <figure class="cert-card"
+                        data-cert-title="Object-Oriented Programming Certification"
+                        data-cert-description="">
+                    <button class="cert-media" type="button" data-certificate-open
+                            aria-label="View [INSERT CERTIFICATE TITLE 2 HERE]">
+                        <span class="cert-media-inner dev-image" data-cert-media>
+                            <img src="assets/images/developer/object-oriented.jpg"
+                                 alt="Object-Oriented Programming Certification"
+                                 loading="lazy"
+                                 data-dev-image>
+                            <span class="dev-image-placeholder">
+                                <span class="material-icons-round" aria-hidden="true">workspace_premium</span>
+                                <span></span>
+                                <small>assets/images/developer/object-oriented.jpg</small>
+                            </span>
+                        </span>
+                        <span class="cert-media-overlay" aria-hidden="true">
+                            <span class="material-icons-round">zoom_in</span>
+                        </span>
+                    </button>
+                    <figcaption class="cert-body">
+                        <strong>Object-Oriented Programming Certificate</strong>
+                        <p></p>
+                    </figcaption>
+                </figure>
+
+                <figure class="cert-card"
+                        data-cert-title="System Architecture Certification"
+                        data-cert-description="">
+                    <button class="cert-media" type="button" data-certificate-open
+                            aria-label="View [INSERT CERTIFICATE TITLE 3 HERE]">
+                        <span class="cert-media-inner dev-image" data-cert-media>
+                            <img src="assets/images/developer/architecture.jpg"
+                                 alt="Image not found"
+                                 loading="lazy"
+                                 data-dev-image>
+                            <span class="dev-image-placeholder">
+                                <span class="material-icons-round" aria-hidden="true">workspace_premium</span>
+                                <span>System Architecture Certificate</span>
+                                <small>assets/images/developer/architecture.jpg</small>
+                            </span>
+                        </span>
+                        <span class="cert-media-overlay" aria-hidden="true">
+                            <span class="material-icons-round">zoom_in</span>
+                        </span>
+                    </button>
+                    <figcaption class="cert-body">
+                        <strong>System Architecture Certificate</strong>
+                        <p></p>
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <!-- Project information -->
+        <section class="about-section dev-section" id="project" aria-labelledby="projectTitle">
+            <div class="about-section-head">
+                <span class="material-icons-round" aria-hidden="true">workspaces</span>
+                <div>
+                    <h3 id="projectTitle">Project Information</h3>
+                    <p>Introducing SmartRoll and the purpose behind it.</p>
+                </div>
+            </div>
+
+            <div class="about-copy dev-project-intro">
+                <p>
+                    SmartRoll is a Student Attendance Management System developed for
+                    Nonok Norte National High School. It replaces paper-based attendance registers with a
+                    centralized workspace for administrators, teachers, and students.
+                </p>
+                <p>
+                    Its main purpose is to make attendance recording, monitoring, and reporting faster and
+                    more accurate, while keeping student information organized in one place.
+                </p>
+            </div>
+
+            <div class="dev-feature-grid">
+                <div class="dev-feature">
+                    <span class="material-icons-round" aria-hidden="true">fact_check</span>
+                    <div>
+                        <strong>Attendance recording</strong>
+                        <span>Record daily attendance quickly and consistently.</span>
+                    </div>
+                </div>
+                <div class="dev-feature">
+                    <span class="material-icons-round" aria-hidden="true">groups</span>
+                    <div>
+                        <strong>Student management</strong>
+                        <span>Keep student records and class assignments organized.</span>
+                    </div>
+                </div>
+                <div class="dev-feature">
+                    <span class="material-icons-round" aria-hidden="true">monitoring</span>
+                    <div>
+                        <strong>Attendance monitoring</strong>
+                        <span>View attendance history and identify patterns.</span>
+                    </div>
+                </div>
+                <div class="dev-feature">
+                    <span class="material-icons-round" aria-hidden="true">summarize</span>
+                    <div>
+                        <strong>Report generation</strong>
+                        <span>Produce attendance summaries for school records.</span>
+                    </div>
+                </div>
+                <div class="dev-feature">
+                    <span class="material-icons-round" aria-hidden="true">admin_panel_settings</span>
+                    <div>
+                        <strong>Role-based access</strong>
+                        <span>Separate experiences for administrators, teachers, and students.</span>
+                    </div>
+                </div>
+                <div class="dev-feature">
+                    <span class="material-icons-round" aria-hidden="true">devices</span>
+                    <div>
+                        <strong>Works on any device</strong>
+                        <span>Responsive access from desktop, tablet, or mobile.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-project-grid dev-project-grid">
+                <div class="about-project-item">
+                    <span>Project name</span>
+                    <strong>SmartRoll</strong>
+                </div>
+                <div class="about-project-item">
+                    <span>Project type</span>
+                    <strong>Student Attendance Management System</strong>
+                </div>
+                <div class="about-project-item">
+                    <span>Institution</span>
+                    <strong>Nonok Norte National High School</strong>
+                </div>
+                <div class="about-project-item">
+                    <span>School year</span>
+                    <strong>2026–2027</strong>
+                </div>
+                <div class="about-project-item about-project-desc">
+                    <span>Project description</span>
+                    <strong>A digital attendance management platform designed to simplify student attendance recording, student information management, attendance monitoring, and report generation.</strong>
+                </div>
+            </div>
+
+            <div class="dev-dev-note">
+                <span class="material-icons-round" aria-hidden="true">history_edu</span>
+                <div>
+                    <strong>System development</strong>
+                    <p>SmartRoll was developed using PHP and MySQL on a XAMPP environment, following a structured system analysis and design process. The system was built with a responsive interface, role-based access, and a centralized database to support reliable attendance recording and reporting for Nonok Norte National High School.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="dev-footer">
+    <div class="dev-footer-inner">
+        <div class="dev-footer-copy">
+            <p>&copy; 2026 Nonok Norte National High School. All rights reserved.</p>
+            <p>SmartRoll · Student Attendance Management System</p>
+        </div>
+        <a class="auth-footer-link dev-footer-link" href="login.php">
+            <span class="material-icons-round" aria-hidden="true">arrow_back</span>
+            <span>Back to Login</span>
+        </a>
+    </div>
+</footer>
+
+<!-- Certificate lightbox -->
+<div class="certificate-lightbox" id="certificateLightbox" aria-hidden="true">
+    <div class="cert-lightbox-card" role="dialog" aria-modal="true" aria-labelledby="certLightboxTitle">
+        <button class="modal-close cert-lightbox-close" type="button" data-cert-lightbox-close aria-label="Close certificate preview">
+            <span class="material-icons-round">close</span>
+        </button>
+        <div class="cert-lightbox-media" data-cert-lightbox-media></div>
+        <div class="cert-lightbox-caption">
+            <h3 id="certLightboxTitle" data-cert-lightbox-title></h3>
+            <p data-cert-lightbox-desc></p>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+<script src="assets/js/about-developer.js"></script>
+</body>
+</html>

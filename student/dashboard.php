@@ -36,7 +36,7 @@ function student_status_counts(PDO $pdo, int $studentId, string $extraWhere = ''
     $stmt = $pdo->prepare(
         "SELECT status, COUNT(*) AS total
          FROM attendance
-         WHERE student_id = ? {$extraWhere}
+         WHERE student_id = ? AND " . attendance_school_day_sql('attendance_date') . " {$extraWhere}
          GROUP BY status"
     );
     $stmt->execute(array_merge([$studentId], $params));
@@ -75,6 +75,7 @@ $stmt = $pdo->prepare(
      JOIN class_subjects cs ON cs.id = a.class_subject_id
      JOIN subjects sub ON sub.id = cs.subject_id
      WHERE a.student_id = ?
+       AND " . attendance_school_day_sql('a.attendance_date') . "
      GROUP BY sub.id, sub.code, sub.name
      ORDER BY sub.name"
 );
@@ -91,7 +92,7 @@ $focusSubjects = array_values(array_filter($subjects, static function (array $su
 $trend = [];
 for ($i = 6; $i >= 0; $i--) {
     $day = date('Y-m-d', strtotime('-' . $i . ' days'));
-    $trend[$day] = ['label' => date('D', strtotime($day)), 'rate' => 0.0, 'total' => 0];
+    $trend[$day] = ['label' => date('D', strtotime($day)), 'rate' => 0.0, 'total' => 0, 'no_class' => is_weekend($day)];
 }
 
 $stmt = $pdo->prepare(
@@ -99,6 +100,7 @@ $stmt = $pdo->prepare(
             COALESCE(SUM(CASE WHEN status IN ('present','late') THEN 1 ELSE 0 END), 0) AS attended
      FROM attendance
      WHERE student_id = ? AND attendance_date BETWEEN ? AND ?
+       AND " . attendance_school_day_sql('attendance_date') . "
      GROUP BY attendance_date"
 );
 $stmt->execute([$studentId, array_key_first($trend), array_key_last($trend)]);
@@ -121,6 +123,7 @@ $stmt = $pdo->prepare(
      JOIN classes c ON c.id = cs.class_id
      JOIN users t ON t.id = cs.teacher_id
      WHERE a.student_id = ?
+       AND " . attendance_school_day_sql('a.attendance_date') . "
      ORDER BY a.attendance_date DESC, a.id DESC
      LIMIT 8"
 );
@@ -228,10 +231,13 @@ require __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="chart-bars" role="img" aria-label="Your attendance rate for the last seven days">
-            <?php foreach ($trend as $day): ?>
-                <?php $height = $day['total'] > 0 ? max(3, min(100, $day['rate'])) : 2; ?>
-                <div class="bar-col" title="<?= e($day['label']) ?>: <?= number_format($day['rate'], 1) ?>%">
-                    <span class="bar-value"><?= $day['total'] > 0 ? number_format($day['rate'], 0) . '%' : '—' ?></span>
+            <?php foreach ($trend as $day):
+                $dayNoClass = !empty($day['no_class']);
+                $height = $day['total'] > 0 ? max(3, min(100, $day['rate'])) : 2;
+                $title = $dayNoClass ? $day['label'] . ': No Class' : $day['label'] . ': ' . number_format($day['rate'], 1) . '%';
+            ?>
+                <div class="bar-col" title="<?= e($title) ?>">
+                    <span class="bar-value"<?= $dayNoClass ? ' style="font-size:10px;white-space:nowrap"' : '' ?>><?= $dayNoClass ? 'No Class' : ($day['total'] > 0 ? number_format($day['rate'], 0) . '%' : '—') ?></span>
                     <div class="bar-track">
                         <div class="bar-fill<?= $day['total'] > 0 ? '' : ' muted' ?>" style="--h: <?= $height ?>%"></div>
                     </div>

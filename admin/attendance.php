@@ -25,6 +25,11 @@ if (is_post() && post_param('save_attendance') === '1') {
         redirect('admin/attendance.php');
     }
 
+    if (is_weekend($postDate)) {
+        flash('No Class: attendance cannot be recorded on Saturdays or Sundays.', 'error');
+        redirect('admin/attendance.php?' . http_build_query(['class_subject' => $csId, 'date' => $postDate]));
+    }
+
     try {
         $saved = save_attendance($pdo, $csId, $postDate, $entries, (int) $user['id']);
         flash('Attendance saved for ' . $saved . ' student' . ($saved === 1 ? '' : 's') . '.', 'success');
@@ -52,7 +57,7 @@ if ($selectedId > 0) {
         flash('That class assignment could not be found.', 'error');
         $selectedId = 0;
     } else {
-        $roster = attendance_roster($pdo, $selectedId, $attendanceDate);
+        $roster = is_weekend($attendanceDate) ? [] : attendance_roster($pdo, $selectedId, $attendanceDate);
     }
 }
 

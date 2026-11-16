@@ -10,6 +10,7 @@ require_role('teacher');
 $pdo = db();
 $user = current_user();
 $teacherId = (int) $user['id'];
+$isNoClassToday = is_weekend(date('Y-m-d'));
 
 $assignments = attendance_class_subjects($pdo, $teacherId);
 
@@ -18,10 +19,12 @@ $todayByCs = [];
 $stmt = $pdo->prepare(
     "SELECT cs.id,
             (SELECT COUNT(*) FROM attendance a
-              WHERE a.class_subject_id = cs.id AND a.attendance_date = CURDATE()) AS marked,
+              WHERE a.class_subject_id = cs.id AND a.attendance_date = CURDATE()
+                AND " . attendance_school_day_sql('a.attendance_date') . ") AS marked,
             (SELECT COUNT(*) FROM attendance a
               WHERE a.class_subject_id = cs.id AND a.attendance_date = CURDATE()
-                AND a.status IN ('present','late')) AS attended
+                AND a.status IN ('present','late')
+                AND " . attendance_school_day_sql('a.attendance_date') . ") AS attended
      FROM class_subjects cs
      WHERE cs.teacher_id = ?"
 );
@@ -49,6 +52,7 @@ $stmt = $pdo->prepare(
      FROM attendance a
      JOIN class_subjects cs ON cs.id = a.class_subject_id
      WHERE cs.teacher_id = ? AND a.attendance_date = CURDATE()
+       AND ' . attendance_school_day_sql('a.attendance_date') . '
      GROUP BY a.status'
 );
 $stmt->execute([$teacherId]);
@@ -70,7 +74,7 @@ foreach ($todayByCs as $entry) {
 $trend = [];
 for ($i = 6; $i >= 0; $i--) {
     $day = date('Y-m-d', strtotime('-' . $i . ' days'));
-    $trend[$day] = ['label' => date('D', strtotime($day)), 'rate' => 0.0, 'total' => 0];
+    $trend[$day] = ['label' => date('D', strtotime($day)), 'rate' => 0.0, 'total' => 0, 'no_class' => is_weekend($day)];
 }
 
 $stmt = $pdo->prepare(
@@ -79,6 +83,7 @@ $stmt = $pdo->prepare(
      FROM attendance a
      JOIN class_subjects cs ON cs.id = a.class_subject_id
      WHERE cs.teacher_id = ? AND a.attendance_date BETWEEN ? AND ?
+       AND " . attendance_school_day_sql('a.attendance_date') . "
      GROUP BY a.attendance_date"
 );
 $stmt->execute([$teacherId, array_key_first($trend), array_key_last($trend)]);
@@ -109,6 +114,7 @@ $stmt = $pdo->prepare(
      JOIN attendance a ON a.student_id = s.id AND a.class_subject_id = cs.id
      WHERE s.status = 'enrolled'
        AND a.attendance_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+       AND " . attendance_school_day_sql('a.attendance_date') . "
      GROUP BY s.id, u.full_name, u.avatar_color, s.student_no, c.name
      HAVING COUNT(DISTINCT a.id) > 0
         AND (SUM(CASE WHEN a.status IN ('present','late') THEN 1 ELSE 0 END) / COUNT(DISTINCT a.id)) < 0.90
@@ -130,6 +136,7 @@ $stmt = $pdo->prepare(
      JOIN subjects sub ON sub.id = cs.subject_id
      JOIN classes c ON c.id = cs.class_id
      WHERE cs.teacher_id = ?
+       AND " . attendance_school_day_sql('a.attendance_date') . "
      ORDER BY a.updated_at DESC, a.id DESC
      LIMIT 6"
 );
@@ -206,8 +213,8 @@ require __DIR__ . '/../includes/header.php';
             </span>
         </div>
         <div>
-            <div class="stat-value"><?= number_format($todayRate, 1) ?>%</div>
-            <div class="stat-label">Today's attendance</div>
+            <div class="stat-value"><?= $isNoClassToday ? 'No Class' : number_format($todayRate, 1) . '%' ?></div>
+            <div class="stat-label"><?= $isNoClassToday ? 'Weekend — no classes' : "Today's attendance" ?></div>
         </div>
     </div>
 </div>
@@ -226,10 +233,13 @@ require __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="chart-bars" role="img" aria-label="Your attendance rate for the last seven days">
-            <?php foreach ($trend as $day): ?>
-                <?php $height = $day['total'] > 0 ? max(3, min(100, $day['rate'])) : 2; ?>
-                <div class="bar-col" title="<?= e($day['label']) ?>: <?= number_format($day['rate'], 1) ?>%">
-                    <span class="bar-value"><?= $day['total'] > 0 ? number_format($day['rate'], 0) . '%' : '—' ?></span>
+            <?php foreach ($trend as $day):
+                $dayNoClass = !empty($day['no_class']);
+                $height = $day['total'] > 0 ? max(3, min(100, $day['rate'])) : 2;
+                $title = $dayNoClass ? $day['label'] . ': No Class' : $day['label'] . ': ' . number_format($day['rate'], 1) . '%';
+            ?>
+                <div class="bar-col" title="<?= e($title) ?>">
+                    <span class="bar-value"<?= $dayNoClass ? ' style="font-size:10px;white-space:nowrap"' : '' ?>><?= $dayNoClass ? 'No Class' : ($day['total'] > 0 ? number_format($day['rate'], 0) . '%' : '—') ?></span>
                     <div class="bar-track">
                         <div class="bar-fill<?= $day['total'] > 0 ? '' : ' muted' ?>" style="--h: <?= $height ?>%"></div>
                     </div>
@@ -239,7 +249,7 @@ require __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="row-between mt-24" style="padding-top:16px;border-top:1px solid var(--outline)">
-            <span class="text-sm text-muted"><?= $sessionsMarked ?> of <?= $loads ?> sessions marked today</span>
+            <span class="text-sm text-muted"><?= $isNoClassToday ? 'No Class today' : $sessionsMarked . ' of ' . $loads . ' sessions marked today' ?></span>
             <a class="btn btn-text btn-sm" href="<?= e(url('teacher/attendance.php')) ?>">Open attendance</a>
         </div>
     </div>
@@ -248,7 +258,7 @@ require __DIR__ . '/../includes/header.php';
         <div class="card-head">
             <div>
                 <h2>Today's breakdown</h2>
-                <p>Across your subject loads</p>
+                <p><?= $isNoClassToday ? 'Weekend — no classes' : 'Across your subject loads' ?></p>
             </div>
         </div>
 
@@ -273,10 +283,10 @@ require __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="info-banner mt-24">
-            <span class="material-icons-round"><?= $sessionsMarked >= $loads && $loads > 0 ? 'verified' : 'pending_actions' ?></span>
+            <span class="material-icons-round"><?= $isNoClassToday ? 'event_busy' : ($sessionsMarked >= $loads && $loads > 0 ? 'verified' : 'pending_actions') ?></span>
             <div>
-                <strong><?= $sessionsMarked >= $loads && $loads > 0 ? 'All sessions marked' : 'Sessions still pending' ?></strong>
-                <span><?= $sessionsMarked >= $loads && $loads > 0 ? 'Great job keeping attendance up to date.' : 'Complete today’s attendance for your remaining classes.' ?></span>
+                <strong><?= $isNoClassToday ? 'No Class today' : ($sessionsMarked >= $loads && $loads > 0 ? 'All sessions marked' : 'Sessions still pending') ?></strong>
+                <span><?= $isNoClassToday ? 'Saturdays and Sundays are not school days. Attendance resumes on the next school day.' : ($sessionsMarked >= $loads && $loads > 0 ? 'Great job keeping attendance up to date.' : 'Complete today’s attendance for your remaining classes.') ?></span>
             </div>
         </div>
     </div>
@@ -327,7 +337,12 @@ require __DIR__ . '/../includes/header.php';
                         </td>
                         <td><?= (int) $assignment['student_count'] ?></td>
                         <td>
-                            <?php if ($info['marked'] > 0): ?>
+                            <?php if ($isNoClassToday): ?>
+                                <span class="chip chip-muted">
+                                    <span class="material-icons-round">event_busy</span>
+                                    No Class
+                                </span>
+                            <?php elseif ($info['marked'] > 0): ?>
                                 <span class="chip chip-present">
                                     <span class="material-icons-round">check_circle</span>
                                     Marked
@@ -340,7 +355,9 @@ require __DIR__ . '/../includes/header.php';
                             <?php endif; ?>
                         </td>
                         <td>
-                            <?php if ($info['marked'] > 0): ?>
+                            <?php if ($isNoClassToday): ?>
+                                <span class="chip chip-muted">No Class</span>
+                            <?php elseif ($info['marked'] > 0): ?>
                                 <span class="chip <?= $rate >= 90 ? 'chip-present' : ($rate >= 75 ? 'chip-late' : 'chip-absent') ?>">
                                     <?= number_format($rate, 1) ?>%
                                 </span>
