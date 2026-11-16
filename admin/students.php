@@ -491,12 +491,12 @@ require __DIR__ . '/../includes/header.php';
             </button>
         </div>
 
-        <form method="post" action="<?= e(url('admin/students.php')) ?>">
-            <?= csrf_field() ?>
-            <input type="hidden" name="mode" value="create" data-modal-mode>
-            <input type="hidden" name="id" value="" data-modal-id>
+        <div class="modal-body">
+            <form id="studentForm" method="post" action="<?= e(url('admin/students.php')) ?>">
+                <?= csrf_field() ?>
+                <input type="hidden" name="mode" value="create" data-modal-mode>
+                <input type="hidden" name="id" value="" data-modal-id>
 
-            <div class="modal-body">
                 <div class="form-grid">
                     <div class="field">
                         <input type="text" id="full_name" name="full_name" placeholder=" " required minlength="3">
@@ -587,16 +587,16 @@ require __DIR__ . '/../includes/header.php';
                         <span class="select-arrow material-icons-round">expand_more</span>
                     </div>
                 </div>
-            </div>
+            </form>
+        </div>
 
-            <div class="modal-actions">
-                <button class="btn btn-text" type="button" data-modal-close>Cancel</button>
-                <button class="btn btn-filled" type="submit">
-                    <span class="material-icons-round">save</span>
-                    Save student
-                </button>
-            </div>
-        </form>
+        <div class="modal-actions">
+            <button class="btn btn-text" type="button" data-modal-close>Cancel</button>
+            <button class="btn btn-filled" type="submit" form="studentForm">
+                <span class="material-icons-round">save</span>
+                Save student
+            </button>
+        </div>
     </div>
 </div>
 

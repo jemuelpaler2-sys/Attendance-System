@@ -101,6 +101,12 @@
     ---------------------------------------------------------------------- */
     var lastFocused = null;
 
+    function syncBodyScrollLock() {
+        var hasOpenModal = !!document.querySelector(".modal-scrim.open");
+        document.body.classList.toggle("modal-open", hasOpenModal);
+        document.body.style.overflow = hasOpenModal ? "hidden" : "";
+    }
+
     function openModal(id, trigger) {
         var scrim = document.getElementById(id);
         if (!scrim) return;
@@ -167,9 +173,11 @@
         }
 
         lastFocused = document.activeElement;
+        var scrollBody = scrim.querySelector(".modal-body");
+        if (scrollBody) scrollBody.scrollTop = 0;
         scrim.classList.add("open");
         scrim.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
+        syncBodyScrollLock();
 
         window.setTimeout(function () {
             var focusable = scrim.querySelector(
@@ -183,9 +191,7 @@
         if (!scrim) return;
         scrim.classList.remove("open");
         scrim.setAttribute("aria-hidden", "true");
-        if (!document.querySelector(".modal-scrim.open")) {
-            document.body.style.overflow = "";
-        }
+        syncBodyScrollLock();
         if (lastFocused && typeof lastFocused.focus === "function") {
             lastFocused.focus();
             lastFocused = null;
@@ -312,7 +318,7 @@
         if (!confirmScrim) return;
         confirmScrim.classList.remove("open");
         confirmScrim.setAttribute("aria-hidden", "true");
-        document.body.style.overflow = "";
+        syncBodyScrollLock();
         if (confirmResolver) {
             var resolve = confirmResolver;
             confirmResolver = null;
@@ -342,7 +348,7 @@
 
         scrim.classList.add("open");
         scrim.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
+        syncBodyScrollLock();
 
         window.setTimeout(function () {
             if (ok) ok.focus();

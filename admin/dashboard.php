@@ -252,8 +252,8 @@ require __DIR__ . '/../includes/header.php';
             <div class="donut-wrap">
                 <div class="donut" style="--p: <?= $todayRate ?>; --donut-color: <?= $donutColor ?>">
                     <div class="donut-center">
-                        <strong><?= number_format($todayRate, 1) ?>%</strong>
-                        <span>Present</span>
+                        <strong><?= $isNoClassToday ? 'No Class' : number_format($todayRate, 1) . '%' ?></strong>
+                        <span><?= $isNoClassToday ? 'Weekend' : 'Present' ?></span>
                     </div>
                 </div>
             </div>

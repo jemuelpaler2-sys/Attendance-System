@@ -2239,9 +2239,16 @@ button {
     background: rgba(15, 19, 24, 0.52);
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     opacity: 0;
     visibility: hidden;
     transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+body.modal-open {
+    overflow: hidden;
+    overscroll-behavior: none;
 }
 
 .modal-scrim.open {
@@ -2283,6 +2290,7 @@ button {
     justify-content: space-between;
     gap: 14px;
     padding: 22px 24px 0;
+    flex: 0 0 auto;
 }
 
 .modal-head h2 {
@@ -2299,7 +2307,11 @@ button {
 
 .modal-body {
     padding: 20px 24px;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-body--flush {
@@ -2313,6 +2325,7 @@ button {
     gap: 10px;
     padding: 16px 24px 22px;
     flex-wrap: wrap;
+    flex: 0 0 auto;
 }
 
 .modal-close {
@@ -2335,16 +2348,28 @@ button {
 /* --------------------------------------------------------------------------
    Add / edit student modal – form alignment fixes
    -------------------------------------------------------------------------- */
-#studentModal .modal > form {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
+#studentModal .modal {
+    max-height: 90vh;
+    max-height: 90dvh;
     min-height: 0;
+    overflow: hidden;
+}
+
+#studentModal .modal-head,
+#studentModal .modal-actions {
+    flex-shrink: 0;
 }
 
 #studentModal .modal-body {
     flex: 1 1 auto;
     min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+#studentModal .modal-body > form {
+    min-width: 0;
 }
 
 #studentModal .form-grid {
@@ -2398,7 +2423,11 @@ button {
 }
 
 #studentModal .modal-actions {
+    position: relative;
+    z-index: 2;
     padding-top: 18px;
+    background: var(--surface);
+    box-shadow: 0 -1px 0 var(--outline);
 }
 
 @media (max-width: 720px) {
